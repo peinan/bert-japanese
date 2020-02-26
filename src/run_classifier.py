@@ -230,15 +230,16 @@ class TDProcessor(DataProcessor):
   def _create_examples(self, lines, set_type):
     examples = []
     for i, line in enumerate(lines):
-      idx_text = line.index('text')
-      idx_label = line.index('label')
-    else:
-      guid = f'{set_type}-{i}'
-      text_a = tokenization.convert_to_unicode(line[idx_text])
-      label = tokenization.convert_to_unicode(line[idx_label])
-      examples.append(
-        InputExample(guid, text_a, label=label)
-      )
+      if i == 0:
+        idx_text = line.index('text')
+        idx_label = line.index('label')
+      else:
+        guid = f'{set_type}-{i}'
+        text_a = tokenization.convert_to_unicode(line[idx_text])
+        label = tokenization.convert_to_unicode(line[idx_label])
+        examples.append(
+          InputExample(guid, text_a, label=label)
+        )
 
     return examples
 
