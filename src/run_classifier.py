@@ -210,6 +210,40 @@ class DataProcessor(object):
         lines.append(line)
       return lines
 
+class TDProcessor(DataProcessor):
+  def get_train_examples(self, data_dir):
+    return self._create_examples(
+      self._read_tsv(os.path.join(data_dir, 'train.tsv'), 'train')
+    )
+
+  def get_dev_examples(self, data_dir):
+    return self._create_examples(
+      self._read_tsv(os.path.join(data_dir, 'dev.tsv'), 'dev')
+    )
+
+  def get_test_examples(self, data_dir):
+    return self._create_examples(
+      self._read_tsv(os.path.join(data_dir, 'test.tsv'), 'test')
+    )
+
+  def get_labels(self):
+    # 業種を当てる？
+    return ['その他', '電子書籍・VOD', '金融', 'EC', '人材', 'エンタメ']
+
+  def _create_examples(self, lines, set_type):
+    examples = []
+    for i, line in enumerate(lines):
+      idx_text = line.index('text')
+      idx_label = line.index('label')
+    else:
+      guid = f'{set_type}-{i}'
+      text_a = tokenization.convert_to_unicode(line[idx_text])
+      label = tokenization.convert_to_unicode(line[idx_label])
+      examples.append(
+        InputExample(guid, text_a, label=label)
+      )
+
+    return examples
 
 class LivedoorProcessor(DataProcessor):
   """Processor for the livedoor data set (see https://www.rondhuit.com/download.html)."""
@@ -659,7 +693,7 @@ def main(_):
   tf.logging.set_verbosity(tf.logging.INFO)
 
   processors = {
-      "livedoor": LivedoorProcessor,
+      "td": TDProcessor,
   }
 
   tokenization.validate_case_matches_checkpoint(FLAGS.do_lower_case,
